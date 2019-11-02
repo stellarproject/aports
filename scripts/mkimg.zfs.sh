@@ -6,7 +6,7 @@ profile_zfs() {
         apks="$apks iscsi-scst efibootmgr vim zfs-scripts zfs zfs-utils-py
                 cciss_vol_status lvm2 mdadm mkinitfs mtools nfs-utils
                 parted rsync sfdisk syslinux unrar util-linux xfsprogs
-                dosfstools ntfs-3g
+                dosfstools ntfs-3g cryptsetup cfdisk
                 "
         local _k _a
         for _k in $kernel_flavors; do
