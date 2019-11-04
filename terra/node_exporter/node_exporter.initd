@@ -1,0 +1,12 @@
+#!/sbin/openrc-run
+supervisor=supervise-daemon
+
+command="/usr/bin/node_exporter"
+command_args="${rc_node_exporter_args}"
+description="Exporter for machine metrics"
+pidfile="/var/run/node_exporter.pid"
+
+depend() {
+	need net
+	use dns
+}

@@ -1,0 +1,37 @@
+# Contributor: Michael Crosby <crosbymichael@gmail.com>
+# Maintainer: Michael Crosby <crosbymichael@gmail.com>
+pkgname="node_exporter"
+pkgver="0.18.1"
+pkgrel=0
+pkgdesc="Exporter for machine metrics"
+url="https://github.com/prometheus/node_exporter"
+arch="all"
+license="Apache-2.0"
+depends=""
+makedepends="go"
+source="node_exporter-$pkgver.tar.gz::https://github.com/prometheus/node_exporter/archive/v$pkgver.tar.gz
+	node_exporter.initd
+"
+builddir="$srcdir/src/github.com/prometheus/node_exporter"
+
+build() {
+	cd "$srcdir"
+	export GOPATH="$PWD"
+	mkdir -p $(dirname "$builddir")
+	ln -s "$PWD/$pkgname-$pkgver" "$builddir"
+	cd "$builddir"
+	go build
+}
+
+check() {
+	./node_exporter --version
+}
+
+package() {
+	install -d "$pkgdir"/usr/bin/
+	install -Dsm755 "$builddir"/node_exporter "$pkgdir"/usr/bin/
+	install -D -m755 "$srcdir"/node_exporter.initd \
+		"$pkgdir"/etc/init.d/node_exporter
+}
+sha512sums="cf2b854fbec1ba39b18432cdc11ab507ebc5b2828e6b34b4f49af9b949fcd365cb3e5eb1e265d0825783810c6b1572a8b3512ec27a46e5c83f89a505590159c0  node_exporter-0.18.1.tar.gz
+93e2003cc4508971471f8ba833539424e843d456c081449d8d4a97ea77f372e76eaf760aa911765d86a81e81c2bcfefb5896350d1f84640ebb340779264e6e60  node_exporter.initd"
