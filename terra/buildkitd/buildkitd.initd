@@ -1,0 +1,11 @@
+#!/sbin/openrc-run
+supervisor=supervise-daemon
+
+command="/usr/bin/buildkitd"
+command_args="--containerd-worker=${rc_buildkitd_containerd_worker:true} --oci-worker=${rc_buildkitd_oci_worker:false} --addr ${rc_buildkitd_addr:unix:///run/buildkit/buildkitd.sock}"
+description="concurrent, cache-efficient, and Dockerfile-agnostic builder toolkit"
+pidfile="/var/run/buildkitd.pid"
+
+depend() {
+	after containerd
+}

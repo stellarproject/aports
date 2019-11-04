@@ -1,0 +1,37 @@
+# Contributor: Michael Crosby <crosbymichael@gmail.com>
+# Maintainer: Michael Crosby <crosbymichael@gmail.com>
+pkgname="buildkitd"
+pkgver="0.6.2"
+pkgrel=0
+pkgdesc="concurrent, cache-efficient, and Dockerfile-agnostic builder toolkit"
+url="https://github.com/moby/buildkit"
+arch="all"
+license="Apache-2.0"
+depends=""
+makedepends="go"
+source="buildkit-$pkgver.tar.gz::https://github.com/moby/buildkit/archive/v$pkgver.tar.gz
+	buildkitd.initd
+"
+builddir="$srcdir/src/github.com/moby/buildkit"
+
+build() {
+	cd "$srcdir"
+	export GOPATH="$PWD"
+	mkdir -p $(dirname "$builddir")
+	ln -s "$PWD/buildkit-$pkgver" "$builddir"
+	cd "$builddir"/cmd/buildkitd
+	GO111MODULE=off	go build
+}
+
+check() {
+	./cmd/buildkitd/buildkitd --version
+}
+
+package() {
+	install -d "$pkgdir"/usr/bin/
+	install -Dsm755 "$builddir"/cmd/buildkitd/buildkitd "$pkgdir"/usr/bin/
+	install -D -m755 "$srcdir"/buildkitd.initd \
+		"$pkgdir"/etc/init.d/buildkitd
+}
+sha512sums="eaa741a5a9760e8f8f33f1eb287a823b0850e8a50b2190e6c77ad61c0d0e6879d17becdeba75e10f4742c97b9578b000e046fb625493343d9f0032b98c972f2b  buildkit-0.6.2.tar.gz
+f61c93977730b3f1ec9732c2c82a23d2b44ab0f4ba312ee718eefb96b3409f74d78b2458bc4527f43e6270b6dce6688fa72920a6e73bf5711a2a723e4a7a92c5  buildkitd.initd"
