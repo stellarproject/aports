@@ -15,9 +15,6 @@ _kpkgver="$_kver-r$_krel"
 _extra_flavors=
 if [ -z "$FLAVOR" ]; then
 	_flavor=vanilla
-	case $CARCH in
-	x86|x86_64) _extra_flavors="virt";;
-	esac
 else
 	_flavor=$FLAVOR
 fi

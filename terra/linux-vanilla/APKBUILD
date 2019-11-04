@@ -7,7 +7,7 @@ case $pkgver in
 	*.*.*)	_kernver=${pkgver%.*};;
 	*.*) _kernver=$pkgver;;
 esac
-pkgrel=0
+pkgrel=1
 pkgdesc="Linux vanilla kernel"
 url="http://kernel.org"
 depends="mkinitfs"
@@ -103,7 +103,7 @@ oldconfig() {
 		make -C "$srcdir"/linux-$_kernver \
 			O="$_builddir" \
 			ARCH="$_carch" HOSTCC="$HOSTCC" \
-			oldconfig
+			listnewconfig oldconfig
 	done
 }
 
@@ -216,7 +216,7 @@ sha512sums="6b5edef47c319a3fa7f6c20a3e0903a5acd89ec75e32dc5f99adcb60c9fe118ea312
 3c73c8c19ad6aea1cd002fe71123d24aefd5c5c0bb472d0cc20060ffb1acc9e64b8f5363c52c3ed40916d67d8ac146cf24a4e0d4bc91bbf39e1daf9ed72be63c  config-vanilla.armhf
 3c73c8c19ad6aea1cd002fe71123d24aefd5c5c0bb472d0cc20060ffb1acc9e64b8f5363c52c3ed40916d67d8ac146cf24a4e0d4bc91bbf39e1daf9ed72be63c  config-vanilla.armv7
 b3e372f51e788e67b5a449a665f2138cb9a93482e2c6643d7055a28f01d7c0e4a1900b305088a089dcf377a1241a16fc30c05ff5b8ccb43420e8eae1626dd9a9  config-vanilla.x86
-c1a16bb7f3b5e69c3d3ae340ba666f544e42b053d160f83232d685b1dce3f1bafebba00fa592f3f5c73e5aded7eba284fa433393b3c0db61a931b6445864dab6  config-vanilla.x86_64
+459c45e72e9c06ab64d32b6c3afa24140839126e9f1f40bfdbc9427d204167f08dfd95428fc689c168784990874135db8cf589588336c1c7946656352ee2090b  config-vanilla.x86_64
 a469cc925da71f425540b7c8148a1eb2be1e4e5bb1dbc109f69e8a93b83f58888e50915d3f7bac8d323474327efdb9a6e01da561b78f9fa489030f0ec1f030fa  config-vanilla.ppc64le
 9d643f629530987a35bfc748fa26b7053c2e245e278afc8d04afbd4dd7ab534c3a7b316cf8dfbebc7f0d7c0d94e9249196e13049ac96504c1e337b7017e6d476  config-vanilla.s390x
 870ccc19417fe56517ac13b0e2fc4cc48e21937af0a2291f57a252b60831c1fa41bf4af8c8b1613cde8d6410723dbab763fa58f1dc7ce8ba7a02c90523eba6bf  patch-5.3.8.xz"
