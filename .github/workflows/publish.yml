@@ -1,0 +1,16 @@
+name: Publish
+
+on:
+  push:
+    branches:
+      - terra
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v1
+    - name: Build
+      run: |
+        docker build --build-arg AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID --build-arg AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY --build-arg S3_BUCKET=$S3_BUCKET --build-arg STELLAR_SIGNING_PRIVATE_KEY=$STELLAR_SIGNING_PRIVATE_KEY --build-arg STELLAR_SIGNING_PUBLIC_KEY=$STELLAR_SIGNING_PUBLIC_KEY -t stellarproject-aports:latest .
+        docker rmi -f stellarproject-aports:latest
