@@ -16,10 +16,20 @@
 # FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
 # USE OR OTHER DEALINGS IN THE SOFTWARE.
+#
+# Available Build Args:
+#   STELLAR_SIGNING_PRIVATE_KEY: private rsa key for signing packages
+#   STELLAR_SIGNING_PUBLIC_KEY: corresponding public key for private signing key
+#   AWS_ACCESS_KEY_ID: AWS access key for uploading packages to s3
+#   AWS_SECRET_ACCESS_KEY: AWS secret key for uploading packages to s3
+#   S3_BUCKET: S3 bucket to upload packages
+#   SKIP_UPLOAD: skip upload to s3
+#   PACKAGES: one or more packages to build directly (default: build all terra packages)
 FROM alpine:latest as build
 ARG STELLAR_SIGNING_PRIVATE_KEY
 ARG STELLAR_SIGNING_PUBLIC_KEY
 ARG SKIP_UPLOAD
+ARG PACKAGES
 RUN apk add -U alpine-sdk bash rsync
 RUN adduser -s /bin/bash -S build && \
     addgroup build abuild && \
@@ -28,27 +38,33 @@ RUN adduser -s /bin/bash -S build && \
     echo "$STELLAR_SIGNING_PUBLIC_KEY" > /etc/apk/keys/stellar.rsa.pub && \
     mkdir -p /home/build/.abuild && \
     echo "PACKAGER_PRIVKEY=\"/etc/apk/keys/stellar.rsa\"" > /home/build/.abuild/abuild.conf
-
 RUN printf "http://dl-cdn.alpinelinux.org/alpine/edge/main\nhttp://dl-cdn.alpinelinux.org/alpine/edge/community\nhttp://dl-cdn.alpinelinux.org/alpine/edge/testing" > /etc/apk/repositories && apk update
 COPY . /src
 RUN chown -R build /src/terra
 USER build
 RUN cd /src && \
-    make terra
+    if [ -z "$PACKAGES" ]; then export PACKAGES=terra; fi && \
+    make $PACKAGES
 
 FROM scratch as package
 COPY --from=build /home/build/packages /packages
 
-FROM alpine:latest
+FROM alpine:latest as upload
 ARG AWS_ACCESS_KEY_ID
 ARG AWS_SECRET_ACCESS_KEY
 ARG S3_BUCKET
+RUN apk add python3 curl cmake build-base
+RUN curl -sSL https://github.com/libthinkpad/apindex/archive/master.zip -o /tmp/master.zip && \
+    cd /tmp && unzip master.zip && cd apindex-master && \
+    cmake . -DCMAKE_INSTALL_PREFIX=/usr && \
+    make install
 RUN printf "http://dl-cdn.alpinelinux.org/alpine/edge/main\nhttp://dl-cdn.alpinelinux.org/alpine/edge/community\nhttp://dl-cdn.alpinelinux.org/alpine/edge/testing" > /etc/apk/repositories && apk update
 RUN apk add -U s3cmd
 COPY --from=package /packages /packages
+RUN cd /packages && apindex . && find . -name "index.html" -exec sed -i '/.*generated/d' index.html {} \;
 RUN if [ ! -z "$SKIP_UPLOAD" ]; then s3cmd --access_key=$AWS_ACCESS_KEY_ID --secret_key=$AWS_SECRET_ACCESS_KEY \
     sync -P /packages/terra/ s3://$S3_BUCKET; fi
 
 # final scratch image for local export if desired
 FROM scratch
-COPY --from=package /packages /
+COPY --from=upload /packages /

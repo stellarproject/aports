@@ -21,6 +21,8 @@ build() {
 	ln -s "$PWD/$pkgname-$pkgver" "$builddir"
 	cd "$builddir"
 	go build
+        # fixup for src dir permissions after build
+        chmod -R +rw "$srcdir"
 }
 
 check() {
