@@ -18,5 +18,5 @@ jobs:
         STELLAR_SIGNING_PRIVATE_KEY: ${{ secrets.STELLAR_SIGNING_PRIVATE_KEY }}
         STELLAR_SIGNING_PUBLIC_KEY: ${{ secrets.STELLAR_SIGNING_PUBLIC_KEY }}
       run: |
-        docker build --build-arg AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID --build-arg AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY --build-arg S3_BUCKET=$S3_BUCKET --build-arg STELLAR_SIGNING_PRIVATE_KEY=$STELLAR_SIGNING_PRIVATE_KEY --build-arg STELLAR_SIGNING_PUBLIC_KEY=$STELLAR_SIGNING_PUBLIC_KEY -t stellarproject-aports:latest .
+        docker build --build-arg AWS_ACCESS_KEY_ID="$AWS_ACCESS_KEY_ID" --build-arg AWS_SECRET_ACCESS_KEY="$AWS_SECRET_ACCESS_KEY" --build-arg S3_BUCKET="$S3_BUCKET" --build-arg STELLAR_SIGNING_PRIVATE_KEY="$STELLAR_SIGNING_PRIVATE_KEY" --build-arg STELLAR_SIGNING_PUBLIC_KEY="$STELLAR_SIGNING_PUBLIC_KEY" -t stellarproject-aports:latest .
         docker rmi -f stellarproject-aports:latest
