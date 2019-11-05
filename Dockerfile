@@ -1,7 +1,8 @@
 FROM alpine:latest as build
 ARG STELLAR_SIGNING_PRIVATE_KEY
 ARG STELLAR_SIGNING_PUBLIC_KEY
-RUN apk add -U alpine-sdk bash
+ARG SKIP_UPLOAD
+RUN apk add -U alpine-sdk bash rsync
 RUN adduser -s /bin/bash -S build && \
     addgroup build abuild && \
     mkdir -p /etc/apk/keys && \
@@ -27,8 +28,8 @@ ARG S3_BUCKET
 RUN printf "http://dl-cdn.alpinelinux.org/alpine/edge/main\nhttp://dl-cdn.alpinelinux.org/alpine/edge/community\nhttp://dl-cdn.alpinelinux.org/alpine/edge/testing" > /etc/apk/repositories && apk update
 RUN apk add -U s3cmd
 COPY --from=package /packages /packages
-RUN s3cmd --access_key=$AWS_ACCESS_KEY_ID --secret_key=$AWS_SECRET_ACCESS_KEY \
-    sync -P /packages/terra/ s3://$S3_BUCKET
+RUN if [ ! -z "$SKIP_UPLOAD" ]; then s3cmd --access_key=$AWS_ACCESS_KEY_ID --secret_key=$AWS_SECRET_ACCESS_KEY \
+    sync -P /packages/terra/ s3://$S3_BUCKET; fi
 
 # final scratch image for local export if desired
 FROM scratch
