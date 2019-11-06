@@ -2,7 +2,7 @@
 # Maintainer: Evan Hazlett <ejhazlett@gmail.com>
 pkgname="terraos-installer"
 pkgver="0.1.1"
-pkgrel=1
+pkgrel=2
 pkgdesc="Stellar Project Terra OS Installer"
 url="https://github.com/stellarproject"
 arch="noarch"
