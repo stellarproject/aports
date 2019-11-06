@@ -25,6 +25,7 @@
 #   S3_BUCKET: S3 bucket to upload packages
 #   SKIP_UPLOAD: skip upload to s3
 #   PACKAGES: one or more packages to build directly (default: build all terra packages)
+#   VERSION: git commit for built version
 FROM alpine:latest as build
 ARG STELLAR_SIGNING_PRIVATE_KEY
 ARG STELLAR_SIGNING_PUBLIC_KEY
@@ -53,9 +54,11 @@ FROM alpine:latest as upload
 ARG AWS_ACCESS_KEY_ID
 ARG AWS_SECRET_ACCESS_KEY
 ARG S3_BUCKET
+ARG VERSION
 RUN printf "http://dl-cdn.alpinelinux.org/alpine/edge/main\nhttp://dl-cdn.alpinelinux.org/alpine/edge/community\nhttp://dl-cdn.alpinelinux.org/alpine/edge/testing" > /etc/apk/repositories && apk update
 RUN apk add -U s3cmd
 COPY --from=package /packages /packages
+RUN if [ ! -z "$VERSION" ]; then echo "$VERSION" > /packages/terra/version; else echo "WARNING: no version specified"; fi
 RUN if [ ! -z "$SKIP_UPLOAD" ]; then s3cmd --access_key=$AWS_ACCESS_KEY_ID --secret_key=$AWS_SECRET_ACCESS_KEY \
     sync -P /packages/terra/ s3://$S3_BUCKET; fi
 

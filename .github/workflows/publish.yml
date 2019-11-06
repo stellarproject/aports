@@ -6,11 +6,11 @@ on:
       - terra
 
 jobs:
-  build:
+  publish:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v1
-    - name: Build
+    - name: Build and Upload
       env:
         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -18,5 +18,14 @@ jobs:
         STELLAR_SIGNING_PRIVATE_KEY: ${{ secrets.STELLAR_SIGNING_PRIVATE_KEY }}
         STELLAR_SIGNING_PUBLIC_KEY: ${{ secrets.STELLAR_SIGNING_PUBLIC_KEY }}
       run: |
-        docker build --build-arg AWS_ACCESS_KEY_ID="$AWS_ACCESS_KEY_ID" --build-arg AWS_SECRET_ACCESS_KEY="$AWS_SECRET_ACCESS_KEY" --build-arg S3_BUCKET="$S3_BUCKET" --build-arg STELLAR_SIGNING_PRIVATE_KEY="$STELLAR_SIGNING_PRIVATE_KEY" --build-arg STELLAR_SIGNING_PUBLIC_KEY="$STELLAR_SIGNING_PUBLIC_KEY" -t stellarproject-aports:latest .
-        docker rmi -f stellarproject-aports:latest
+        VERSION=$(curl -sSL alpine.stellarproject.io/terra/version)
+        COMMIT=$(git rev-parse HEAD)
+        PACKAGES=$(git diff --name-only $VERSION^..$COMMIT | grep terra/ | awk -F/ '{print$1"/"$2}' | uniq)
+        docker build --build-arg AWS_ACCESS_KEY_ID="$AWS_ACCESS_KEY_ID" \
+            --build-arg AWS_SECRET_ACCESS_KEY="$AWS_SECRET_ACCESS_KEY" \
+            --build-arg S3_BUCKET="$S3_BUCKET" \
+            --build-arg STELLAR_SIGNING_PRIVATE_KEY="$STELLAR_SIGNING_PRIVATE_KEY" \
+            --build-arg STELLAR_SIGNING_PUBLIC_KEY="$STELLAR_SIGNING_PUBLIC_KEY" \
+            --build-arg PACKAGES="$PACKAGES" \
+            -t stellarproject-aports:$COMMIT .
+        docker rmi -f stellarproject-aports:$COMMIT
