@@ -34,4 +34,4 @@ EOF
     chmod +x "$pkgdir/usr/bin/setup-terra"
 }
 
-sha512sums="9a984f253550a49f4e741338071656270ff3389e487437e82a7e97dd602c596a master.zip"
+sha512sums="e5d41165ad6121fefe97b6b2aefc8104e49c3b77f9b908a224f9a0da21bc34c5d0aa4e26ca5908817dff4e7ab8352a441dc3731ff75090d84fe241cb70f86f93 master.zip"
