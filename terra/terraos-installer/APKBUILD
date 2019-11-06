@@ -2,7 +2,7 @@
 # Maintainer: Evan Hazlett <ejhazlett@gmail.com>
 pkgname="terraos-installer"
 pkgver="0.1.1"
-pkgrel=0
+pkgrel=1
 pkgdesc="Stellar Project Terra OS Installer"
 url="https://github.com/stellarproject"
 arch="noarch"
@@ -11,8 +11,8 @@ depends="dialog bash cryptsetup zfs zfs-scripts zfs-udev sgdisk efibootmgr"
 makedepends=""
 install=""
 subpackages=""
-source="https://github.com/ehazlett/terraos-installer/archive/master.zip"
-builddir="$srcdir/$pkgname-master"
+source="https://github.com/ehazlett/terraos-installer/archive/v$pkgver.zip"
+builddir="$srcdir/$pkgname-$pkgver"
 options="!check !archcheck !strip"
 
 prepare() {
@@ -33,5 +33,4 @@ cd /usr/share/$pkgname
 EOF
     chmod +x "$pkgdir/usr/bin/setup-terra"
 }
-
-sha512sums="e5d41165ad6121fefe97b6b2aefc8104e49c3b77f9b908a224f9a0da21bc34c5d0aa4e26ca5908817dff4e7ab8352a441dc3731ff75090d84fe241cb70f86f93 master.zip"
+sha512sums="111e89aa43ce0ad82cb2ed53427ed274d093ebdaae8657879b1503cc9c68701fcfd55e7bdb8e8a81b46e898bde836f4cbb25215872e9c601508fbf80b3f7d108  v0.1.1.zip"
