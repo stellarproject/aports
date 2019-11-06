@@ -27,5 +27,6 @@ jobs:
             --build-arg STELLAR_SIGNING_PRIVATE_KEY="$STELLAR_SIGNING_PRIVATE_KEY" \
             --build-arg STELLAR_SIGNING_PUBLIC_KEY="$STELLAR_SIGNING_PUBLIC_KEY" \
             --build-arg PACKAGES="$PACKAGES" \
+            --build-arg VERSION="$COMMIT" \
             -t stellarproject-aports:$COMMIT .
         docker rmi -f stellarproject-aports:$COMMIT
