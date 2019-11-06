@@ -53,15 +53,9 @@ FROM alpine:latest as upload
 ARG AWS_ACCESS_KEY_ID
 ARG AWS_SECRET_ACCESS_KEY
 ARG S3_BUCKET
-RUN apk add python3 curl cmake build-base
-RUN curl -sSL https://github.com/libthinkpad/apindex/archive/master.zip -o /tmp/master.zip && \
-    cd /tmp && unzip master.zip && cd apindex-master && \
-    cmake . -DCMAKE_INSTALL_PREFIX=/usr && \
-    make install
 RUN printf "http://dl-cdn.alpinelinux.org/alpine/edge/main\nhttp://dl-cdn.alpinelinux.org/alpine/edge/community\nhttp://dl-cdn.alpinelinux.org/alpine/edge/testing" > /etc/apk/repositories && apk update
 RUN apk add -U s3cmd
 COPY --from=package /packages /packages
-RUN cd /packages && apindex . && find . -name "index.html" -exec sed -i '/.*generated/d' index.html {} \;
 RUN if [ ! -z "$SKIP_UPLOAD" ]; then s3cmd --access_key=$AWS_ACCESS_KEY_ID --secret_key=$AWS_SECRET_ACCESS_KEY \
     sync -P /packages/terra/ s3://$S3_BUCKET; fi
 
