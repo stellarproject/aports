@@ -1,0 +1,32 @@
+# Contributor: Evan Hazlett <ejhazlett@gmail.com>
+# Maintainer: Evan Hazlett <ejhazlett@gmail.com>
+pkgname="vab"
+pkgver="5"
+pkgrel=0
+pkgdesc="container assembly builder"
+url="https://github.com/stellarproject/vab"
+arch="all"
+license="MIT"
+depends=""
+makedepends="go"
+source="vab-$pkgver.tar.gz::https://github.com/stellarproject/vab/archive/$pkgver.tar.gz"
+builddir="$srcdir/src/github.com/stellarproject/vab"
+
+build() {
+	cd "$srcdir"
+	export GOPATH="$PWD"
+	mkdir -p $(dirname "$builddir")
+	ln -s "$PWD/vab-$pkgver" "$builddir"
+	cd "$builddir"
+	make
+}
+
+check() {
+	./vab -v
+}
+
+package() {
+	install -d "$pkgdir/usr/bin"
+	install -Dsm755 "$builddir/vab" "$pkgdir/usr/bin/"
+}
+sha512sums="7840e7ec1fa8db0782b25d38417da3678169b7e9f344a693567ab93bec220d1ea9e63c8b00e639bfcbc95a7f23753ec1ce827c33852fc516d90dcd885100ebe6  vab-5.tar.gz"
