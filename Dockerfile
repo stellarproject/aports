@@ -1,3 +1,4 @@
+# syntax = docker/dockerfile:experimental
 # Copyright 2019 Stellar Project
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy of
@@ -18,50 +19,44 @@
 # USE OR OTHER DEALINGS IN THE SOFTWARE.
 #
 # Available Build Args:
-#   STELLAR_SIGNING_PRIVATE_KEY: private rsa key for signing packages
-#   STELLAR_SIGNING_PUBLIC_KEY: corresponding public key for private signing key
+#   SIGNING_PRIVATE_KEY: private rsa key for signing packages
+#   SIGNING_PUBLIC_KEY: corresponding public key for private signing key
 #   AWS_ACCESS_KEY_ID: AWS access key for uploading packages to s3
 #   AWS_SECRET_ACCESS_KEY: AWS secret key for uploading packages to s3
 #   S3_BUCKET: S3 bucket to upload packages
 #   SKIP_UPLOAD: skip upload to s3
 #   PACKAGES: one or more packages to build directly (default: build all terra packages)
+#   PACKAGE_DIR: dest dir for built packages
 #   VERSION: git commit for built version
 FROM alpine:latest as build
-ARG STELLAR_SIGNING_PRIVATE_KEY
-ARG STELLAR_SIGNING_PUBLIC_KEY
+ARG SIGNING_PRIVATE_KEY
+ARG SIGNING_PUBLIC_KEY
 ARG SKIP_UPLOAD
 ARG PACKAGES
+ARG PACKAGE_DIR
+ARG MIRROR
 RUN apk add -U alpine-sdk bash rsync
-RUN adduser -s /bin/bash -S build && \
+RUN adduser -u 1000 -s /bin/bash -D build && \
     addgroup build abuild && \
     mkdir -p /etc/apk/keys && \
-    echo "$STELLAR_SIGNING_PRIVATE_KEY" > /etc/apk/keys/stellar.rsa && \
-    echo "$STELLAR_SIGNING_PUBLIC_KEY" > /etc/apk/keys/stellar.rsa.pub && \
+    echo "$SIGNING_PRIVATE_KEY" > /etc/apk/keys/build.rsa && \
+    echo "$SIGNING_PUBLIC_KEY" > /etc/apk/keys/build.rsa.pub && \
     mkdir -p /home/build/.abuild && \
-    echo "PACKAGER_PRIVKEY=\"/etc/apk/keys/stellar.rsa\"" > /home/build/.abuild/abuild.conf
-RUN printf "http://dl-cdn.alpinelinux.org/alpine/edge/main\nhttp://dl-cdn.alpinelinux.org/alpine/edge/community\nhttp://dl-cdn.alpinelinux.org/alpine/edge/testing" > /etc/apk/repositories && apk update
-COPY . /src
-RUN chown -R build /src/terra
+    echo "PACKAGER_PRIVKEY=\"/etc/apk/keys/build.rsa\"" > /home/build/.abuild/abuild.conf
+RUN if [ -z "${MIRROR}" ]; then echo "INFO: using default mirror"; export MIRROR="http://dl-cdn.alpinelinux.org/alpine"; fi; printf "${MIRROR}/edge/main\n${MIRROR}/edge/community\n${MIRROR}/edge/testing" > /etc/apk/repositories && apk update
+COPY --chown=1000 . /src
+RUN mkdir -p /packages && chown -R build /packages
 USER build
-RUN cd /src && \
-    if [ -z "$PACKAGES" ]; then export PACKAGES=terra; fi && \
-    make $PACKAGES
-
-FROM scratch as package
-COPY --from=build /home/build/packages /packages
-
-FROM alpine:latest as upload
-ARG AWS_ACCESS_KEY_ID
-ARG AWS_SECRET_ACCESS_KEY
-ARG S3_BUCKET
-ARG VERSION
-RUN printf "http://dl-cdn.alpinelinux.org/alpine/edge/main\nhttp://dl-cdn.alpinelinux.org/alpine/edge/community\nhttp://dl-cdn.alpinelinux.org/alpine/edge/testing" > /etc/apk/repositories && apk update
-RUN apk add -U s3cmd
-COPY --from=package /packages /packages
-RUN if [ ! -z "$VERSION" ]; then echo "$VERSION" > /packages/terra/version; else echo "WARNING: no version specified"; fi
-RUN if [ ! -z "$SKIP_UPLOAD" ]; then s3cmd --access_key=$AWS_ACCESS_KEY_ID --secret_key=$AWS_SECRET_ACCESS_KEY \
-    sync -P /packages/terra/ s3://$S3_BUCKET; fi
+RUN echo "Building $PACKAGES"
+RUN if [ -z "$PACKAGES" ]; then echo "ERR: PACKAGES arg must be specified"; exit 1; fi
+RUN --mount=id=packages,type=cache,target=/var/tmp/packages,uid=1000,mode=0777 (cd /src && \
+    find /var/tmp/packages -name "APKINDEX.tar.gz" -delete && \
+    make PACKAGE_DIR=/var/tmp/packages $PACKAGES; if [ $? -ne 0 ]; then touch /tmp/build-error; fi) || true ; \
+    cp -rf /var/tmp/packages / && \
+    exit 0
+# we exit true above to make sure the cache is always saved.  we check for an error here to notify of build errors
+RUN if [ -e /tmp/build-error ]; then echo "ERR: error during package build.  Check logs."; exit 1; fi
 
 # final scratch image for local export if desired
 FROM scratch
-COPY --from=upload /packages /
+COPY --from=build /packages /

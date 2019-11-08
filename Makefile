@@ -2,16 +2,28 @@
 #
 # To build all: make terra
 # To build a specific package: make terra/<package> (i.e. make terra/terraos-installer)
+# To build all with buildkit: make buildkit
+#   Note: this will build all packages and use a build cache.  The first run will take a long
+#   time as it will build the kernel but subsequent builds should be cached efficiently.
 
-TERRA_PKGS = $(sort $(shell ls -d terra/*))
+PACKAGES?=$(sort $(shell ls -d terra/*))
+SIGNING_PRIVATE_KEY?=
+SIGNING_PUBLIC_KEY?=
+MIRROR?=http://mirrors.gigenet.com/alpinelinux
+PACKAGE_DIR?=./packages
+VAB_ARGS?=
+OUTPUT_DIR?=./build
 
-terra: $(TERRA_PKGS)
+terra: $(PACKAGES)
 
-$(TERRA_PKGS):
+$(PACKAGES):
 	@echo "building -> $(basename $@)"
-	@cd $@ ; abuild -r
+	@cd $@; abuild -c -r -P ${PACKAGE_DIR}
+
+buildkit:
+	@vab build --local --output ${OUTPUT_DIR} -a PACKAGE_DIR=${PACKAGE_DIR} -a PACKAGES="terra/buildkitd terra/terraos-installer terra/node_exporter terra/vab" -a MIRROR="${MIRROR}" -a SIGNING_PRIVATE_KEY="$${SIGNING_PRIVATE_KEY}" -a SIGNING_PUBLIC_KEY="$${SIGNING_PUBLIC_KEY}" ${VAB_ARGS} .
 
 clean:
 	@rm -rf build
 
-.PHONY: $(TERRA_PKGS) clean
+.PHONY: $(PACKAGES) buildkit clean
