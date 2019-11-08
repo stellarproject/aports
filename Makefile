@@ -21,7 +21,7 @@ $(PACKAGES):
 	@cd $@; abuild -c -r -P ${PACKAGE_DIR}
 
 buildkit:
-	@vab build --local --output ${OUTPUT_DIR} -a PACKAGE_DIR=${PACKAGE_DIR} -a PACKAGES="terra/buildkitd terra/terraos-installer terra/node_exporter terra/vab" -a MIRROR="${MIRROR}" -a SIGNING_PRIVATE_KEY="$${SIGNING_PRIVATE_KEY}" -a SIGNING_PUBLIC_KEY="$${SIGNING_PUBLIC_KEY}" ${VAB_ARGS} .
+	@vab build --local --output ${OUTPUT_DIR} -a PACKAGE_DIR=${PACKAGE_DIR} -a PACKAGES="terra" -a MIRROR="${MIRROR}" -a SIGNING_PRIVATE_KEY="$${SIGNING_PRIVATE_KEY}" -a SIGNING_PUBLIC_KEY="$${SIGNING_PUBLIC_KEY}" ${VAB_ARGS} .
 
 clean:
 	@rm -rf build
