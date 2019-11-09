@@ -1,7 +1,7 @@
 # Contributor: Stellar Project
 # Maintainer: Evan Hazlett <ejhazlett@gmail.com>
 pkgname="terraos-installer"
-pkgver="0.1.3"
+pkgver="0.1.4"
 pkgrel=0
 pkgdesc="Stellar Project Terra OS Installer"
 url="https://github.com/stellarproject"
@@ -33,4 +33,4 @@ cd /usr/share/$pkgname
 EOF
     chmod +x "$pkgdir/usr/bin/setup-terra"
 }
-sha512sums="a1f2e4fff26e341dfd7a01bcfe3fe59685a1134b9dd0557f4efc86c100fd727bb46c2520e310eeb4a611c7d3ba1af67383ba6515817f5b039119311f3cf9ead5  v0.1.3.zip"
+sha512sums="33636addd2093b4314d98dd7fafa58201582947a79d5bdb8a0eefbedc0a69693e35e7718a83f778b3cb1e462cdc902ab9274dc5d03d42105140ee68977850bf8  v0.1.4.zip"
