@@ -2,7 +2,7 @@
 
 _flavor=terra
 pkgname=linux-${_flavor}
-pkgver=5.3.9
+pkgver=5.3.10
 case $pkgver in
 	*.*.*)	_kernver=${pkgver%.*};;
 	*.*) _kernver=$pkgver;;
@@ -106,7 +106,7 @@ build() {
 	for i in $_flavors; do
 		cd "$srcdir"/build-$i.$CARCH
                 make -j$(nproc) ARCH="$_carch" CC="${CC:-gcc}" \
-			KBUILD_BUILD_VERSION="$((pkgrel + 1 ))-Terra"
+			KBUILD_BUILD_VERSION="$((pkgrel + 1 ))-Alpine"
 	done
 }
 
