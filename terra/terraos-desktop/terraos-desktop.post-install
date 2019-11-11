@@ -1,0 +1,32 @@
+#!/bin/sh
+
+/etc/init.d/udev start && /etc/init.d/udev-trigger start && /etc/init.d/udev-settle start
+rc-update add udev sysinit
+rc-update add udev-trigger sysinit
+rc-update add udev-settle sysinit
+rc-update add acpid
+rc-update add dbus boot
+rc-update add alsa
+rc-update add bluetooth
+rc-update add gdm
+
+dconf update
+
+# check for intel video to enable KMS
+lspci | grep VGA | grep Intel | grep -e "\(HD\|Iris\)" >/dev/null
+if [ $? -eq 0 ]; then
+    echo "setting up KMS"
+    grep i915 /etc/modules >/dev/null
+    if [ $? -ne 0 ]; then
+        echo i915 >> /etc/modules
+    fi
+    grep fbcon /etc/modules >/dev/null
+    if [ $? -ne 0 ]; then
+        echo fbcon >> /etc/modules
+    fi
+    grep kms /etc/mkinitfs/mkinitfs.conf >/dev/null
+    if [ $? -ne 0 ]; then
+        sed -i 's/base/base kms/' /etc/mkinitfs/mkinitfs.conf
+    fi
+    mkinitfs
+fi
