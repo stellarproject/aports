@@ -1,0 +1,4 @@
+#!/bin/sh
+for theme in Papirus-Dark Papirus-Light Papirus ePapirus; do
+    gtk-update-icon-cache -q "/usr/share/icons/$theme" || true
+done
