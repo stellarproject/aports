@@ -2,12 +2,12 @@
 # Maintainer: Evan Hazlett <ejhazlett@gmail.com>
 pkgname="terraos-desktop"
 pkgver="0.1.4"
-pkgrel=0
+pkgrel=1
 pkgdesc="Stellar Project Terra OS Desktop"
 url="https://github.com/stellarproject"
 arch="noarch"
 license="MIT"
-depends="gnome alsa-utils alsa-lib alsaconf pulseaudio pulseaudio-alsa alsa-plugins-pulse pulseaudio-utils ttf-cantarell ttf-hack networkmanager iwd coreutils dbus udev acpi bluez gnome-bluetooth gnome-terminal firefox sudo xf86-input-libinput"
+depends="gnome papirus-icon-theme alsa-utils alsa-lib alsaconf pulseaudio pulseaudio-alsa alsa-plugins-pulse pulseaudio-utils ttf-cantarell ttf-hack networkmanager iwd coreutils dbus udev acpi bluez gnome-bluetooth gnome-terminal firefox sudo xf86-input-libinput"
 makedepends=""
 install="$pkgname.post-install"
 subpackages=""
