@@ -28,13 +28,14 @@
 #   PACKAGES: one or more packages to build directly (default: build all terra packages)
 #   PACKAGE_DIR: dest dir for built packages
 #   VERSION: git commit for built version
-FROM alpine:latest as build
+FROM alpine:edge as build
 ARG SIGNING_PRIVATE_KEY
 ARG SIGNING_PUBLIC_KEY
 ARG SKIP_UPLOAD
 ARG PACKAGES
 ARG PACKAGE_DIR
 ARG MIRROR
+RUN apk upgrade
 RUN apk add -U alpine-sdk bash rsync
 RUN adduser -u 1000 -s /bin/bash -D build && \
     addgroup build abuild && \
@@ -47,13 +48,11 @@ RUN if [ -z "${MIRROR}" ]; then echo "INFO: using default mirror"; export MIRROR
 COPY --chown=1000 . /src
 RUN mkdir -p /packages && chown -R build /packages
 USER build
-RUN echo "Building $PACKAGES"
-RUN if [ -z "$PACKAGES" ]; then echo "ERR: PACKAGES arg must be specified"; exit 1; fi
 RUN --mount=id=packages,type=cache,target=/var/tmp/packages,uid=1000,mode=0777 (cd /src && \
     find /var/tmp/packages -name "APKINDEX.tar.gz" -delete && \
-    make PACKAGE_DIR=/var/tmp/packages $PACKAGES; if [ $? -ne 0 ]; then touch /tmp/build-error; fi) || true ; \
+    make -B PACKAGE_DIR=/var/tmp/packages terra; if [ $? -ne 0 ]; then touch /tmp/build-error; fi) || true ; \
     cp -rf /var/tmp/packages / && \
-    exit 0
+    exit -1
 # we exit true above to make sure the cache is always saved.  we check for an error here to notify of build errors
 RUN if [ -e /tmp/build-error ]; then echo "ERR: error during package build.  Check logs."; exit 1; fi
 

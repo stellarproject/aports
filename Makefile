@@ -10,7 +10,7 @@ PACKAGES?=$(sort $(shell ls -d terra/*))
 SIGNING_PRIVATE_KEY?=
 SIGNING_PUBLIC_KEY?=
 MIRROR?=http://mirrors.gigenet.com/alpinelinux
-PACKAGE_DIR?=./packages
+PACKAGE_DIR?=${HOME}/packages
 VAB_ARGS?=
 OUTPUT_DIR?=./build
 
@@ -18,12 +18,12 @@ terra: $(PACKAGES)
 
 $(PACKAGES):
 	@echo "building -> $(basename $@)"
-	@cd $@; abuild -c -r -P ${PACKAGE_DIR}
+	@cd $@; abuild -c -r -R -P ${PACKAGE_DIR}
 
 buildkit:
-	@vab build --local --output ${OUTPUT_DIR} -a PACKAGE_DIR=${PACKAGE_DIR} -a PACKAGES="terra" -a MIRROR="${MIRROR}" -a SIGNING_PRIVATE_KEY="$${SIGNING_PRIVATE_KEY}" -a SIGNING_PUBLIC_KEY="$${SIGNING_PUBLIC_KEY}" ${VAB_ARGS} .
+	@vab build --local --output ${OUTPUT_DIR} -a PACKAGE_DIR=${PACKAGE_DIR} -a "PACKAGES=${PACKAGES}" -a MIRROR="${MIRROR}" -a SIGNING_PRIVATE_KEY="$${SIGNING_PRIVATE_KEY}" -a SIGNING_PUBLIC_KEY="$${SIGNING_PUBLIC_KEY}" ${VAB_ARGS} .
 
 clean:
 	@rm -rf build
 
-.PHONY: $(PACKAGES) buildkit clean
+.PHONY: $(PACKAGES) buildkit terra clean
