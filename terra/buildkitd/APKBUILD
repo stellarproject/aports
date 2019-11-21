@@ -7,7 +7,7 @@ pkgdesc="concurrent, cache-efficient, and Dockerfile-agnostic builder toolkit"
 url="https://github.com/moby/buildkit"
 arch="all"
 license="Apache-2.0"
-depends=""
+depends="containerd"
 makedepends="go"
 source="buildkit-$pkgver.tar.gz::https://github.com/moby/buildkit/archive/v$pkgver.tar.gz
 	buildkitd.initd

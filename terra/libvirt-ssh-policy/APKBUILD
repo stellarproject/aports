@@ -1,0 +1,22 @@
+# Contributor: Michael Crosby <crosbymichael@gmail.com>
+# Maintainer: Michael Crosby <crosbymichael@gmail.com>
+
+pkgname="libvirt-ssh-policy"
+pkgver="1.0.0"
+pkgrel=0
+pkgdesc="libvirt ssh policy"
+url="https://github.com/stellarproject/aports"
+arch="all"
+license="MIT"
+depends="polkit"
+source="
+	50-libvirt-ssh-remote-access-policy.pkla
+"
+builddir="$srcdir/src"
+
+package() {
+	install -d "$pkgdir"/etc/polkit-1/localauthority/50-local.d
+	install -D -m644 "$srcdir"/50-libvirt-ssh-remote-access-policy.pkla "$pkgdir"/etc/polkit-1/localauthority/50-local.d/50-libvirt-ssh-remote-access-policy.pkla
+}
+
+sha512sums="c29c78f10ce8ff2775490a9fe82b72724e66a368ed4a6fcb6071722513717803d91f282679cab8e96f3d5da6bad131662f03c4065675f46ce74939c44b5d49dc  50-libvirt-ssh-remote-access-policy.pkla"
