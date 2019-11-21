@@ -1,0 +1,22 @@
+# Contributor: Michael Crosby <crosbymichael@gmail.com>
+# Maintainer: Michael Crosby <crosbymichael@gmail.com>
+
+pkgname="terra-motd"
+pkgver="1.0.0"
+pkgrel=0
+pkgdesc="terra MOTD"
+url="https://github.com/stellarproject/aports"
+arch="all"
+license="MIT"
+depends=""
+source="
+	motd
+"
+builddir="$srcdir/src"
+
+package() {
+	install -d "$pkgdir"/etc
+	install -D -m644 "$srcdir"/motd "$pkgdir"/etc/motd
+}
+
+sha512sums="bd625d00a50784ea9b6c0b06c7c68103f81b74a29ec1ed412447a2c01f82ae9a0f12de9b29e6af828a925aa1d01928f6db5f3acdca66e71aaad82e4bdd4b5a35  motd"
