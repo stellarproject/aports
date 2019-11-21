@@ -1,0 +1,40 @@
+# Contributor: Evan Hazlett <ejhazlett@gmail.com>
+# Maintainer: Evan Hazlett <ejhazlett@gmail.com>
+
+pkgname=orbit
+
+# NOTE: containerd's Makefile tries to get REVISION from git, but we're building from a tarball.
+_commit=ef039a5cfec38cad94dd89c0613f09c6bbccf322
+pkgver=2.0.0
+pkgrel=0
+pkgdesc="orbit container daemon"
+url="https://stellarproject.io"
+arch="all"
+license="MIT"
+depends="containerd"
+makedepends="go"
+source="orbit-$_commit.tar.gz::https://github.com/stellarproject/orbit/archive/$_commit.tar.gz
+	orbit.initd
+"
+builddir="$srcdir/src/github.com/stellarproject/orbit"
+
+build() {
+	cd "$srcdir"
+	export GOPATH="$PWD"
+	mkdir -p $(dirname "$builddir")
+        mv "$srcdir/orbit-$_commit" "$builddir"
+	cd "$builddir"
+	make VERSION="v$pkgver" REVISION="$_commit"
+}
+
+check() {
+	./build/ob --version
+}
+
+package() {
+	install -d "$pkgdir"/usr/bin/
+	install -Dsm755 "$builddir"/build/* "$pkgdir"/usr/bin/
+	install -Dm644 "$srcdir"/orbit.initd "$pkgdir"/etc/init.d/orbit
+}
+sha512sums="4ef679796de599314f7e680ba6f3ab834f2ed99ea4ed48cb3b9c735bc3cf2c2216b6e68c5d3747fd321db7c545423cc1cbf633609aaa3249729fe9eef7c4f497  orbit-ef039a5cfec38cad94dd89c0613f09c6bbccf322.tar.gz
+f75763ca8119a7177b93af0b633d685718b0bd8d70afeaf97c718fad775f21ed1bc7bbdd2807fe1ba2802a2dcc719c0aff0df5bbd7302d04c47ecbca7c2053e3  orbit.initd"
