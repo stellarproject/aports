@@ -2,7 +2,7 @@
 # Maintainer: Michael Crosby <crosbymichael@gmail.com>
 pkgname="buildkitd"
 pkgver="0.6.2"
-pkgrel=0
+pkgrel=1
 pkgdesc="concurrent, cache-efficient, and Dockerfile-agnostic builder toolkit"
 url="https://github.com/moby/buildkit"
 arch="all"
