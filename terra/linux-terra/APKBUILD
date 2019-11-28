@@ -3,7 +3,7 @@
 
 _flavor=terra
 pkgname=linux-${_flavor}
-pkgver=5.3.12
+pkgver=5.4
 case $pkgver in
 	*.*.*)	_kernver=${pkgver%.*};;
 	*.*) _kernver=$pkgver;;
