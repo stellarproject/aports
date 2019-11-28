@@ -8,7 +8,7 @@ _rel=0
 
 _flavor=${FLAVOR:-terra}
 _kpkg=linux-$_flavor
-_kver=5.4
+_kver=5.4.0
 _krel=0
 
 _kpkgver="$_kver-r$_krel"
