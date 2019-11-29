@@ -9,8 +9,10 @@ rc-update add dbus boot
 rc-update add alsa
 rc-update add bluetooth
 rc-update add gdm
-
-dconf update
+# networking
+rc-update add networkmanager
+rc-update del networking
+rc-update del wpa_supplicant
 
 # check for intel video to enable KMS
 lspci | grep VGA | grep Intel | grep -e "\(HD\|Iris\)" >/dev/null

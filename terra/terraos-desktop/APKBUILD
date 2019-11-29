@@ -1,18 +1,15 @@
 # Contributor: Evan Hazlett <ejhazlett@gmail.com>
 # Maintainer: Evan Hazlett <ejhazlett@gmail.com>
 pkgname="terraos-desktop"
-pkgver="0.1.4"
-pkgrel=1
+pkgver="0.2.0"
+pkgrel=0
 pkgdesc="Stellar Project Terra OS Desktop"
 url="https://github.com/stellarproject"
 arch="noarch"
 license="MIT"
-depends="gnome papirus-icon-theme alsa-utils alsa-lib alsaconf pulseaudio pulseaudio-alsa alsa-plugins-pulse pulseaudio-utils ttf-cantarell ttf-hack networkmanager iwd coreutils dbus udev acpi bluez gnome-bluetooth gnome-terminal firefox sudo xf86-input-libinput"
+depends="sway swaylock swayidle papirus-icon-theme alsa-utils alsa-lib alsaconf pulseaudio pulseaudio-alsa alsa-plugins-pulse pulseaudio-utils ttf-cantarell ttf-hack networkmanager coreutils dbus udev acpi bluez lxterminal alacritty firefox sudo xf86-input-libinput less"
 makedepends=""
 install="$pkgname.post-install"
-subpackages=""
-source="https://github.com/ehazlett/terraos-desktop/archive/v$pkgver.zip"
-builddir="$srcdir/$pkgname-$pkgver"
 options="!check !archcheck !strip"
 
 prepare() {
@@ -24,13 +21,7 @@ build() {
 }
 
 package() {
-    mkdir -p "$pkgdir/usr/share/$pkgname"
-    cp -r "$builddir"/* "$pkgdir/usr/share/$pkgname/"
-    mkdir -p "$pkgdir/etc/dconf/db/local.d/"
-    cp -r "$builddir/dconf-settings.ini" "$pkgdir/etc/dconf/db/local.d/01-terra"
+    mkdir -p "$pkgdir"
     mkdir -p "$pkgdir/etc/security/limits.d"
     echo "@audio - nice -11" > "$pkgdir/etc/security/limits.d/audio.conf"
-    mkdir -p "$pkgdir/etc/dconf/profile"
-    cp -f "$builddir/user" "$pkgdir/etc/dconf/profile/user"
 }
-sha512sums="9948f5fd7aee3cafe4f1c9d3fa3bba74aa4e158749b1f633cc0a4dc94b508410321a6fac21f407b13e87cf7ca7d94db71b8b40c5eb3535567f789e22f07ea7c3  v0.1.4.zip"
