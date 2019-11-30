@@ -1,0 +1,25 @@
+# Contributor: Evan Hazlett <ejhazlett@gmail.com>
+# Maintainer: Evan Hazlett <ejhazlett@gmail.com>
+pkgname="terraos-base"
+pkgver="0.1.0"
+pkgrel=0
+pkgdesc="Stellar Project Terra OS Base"
+url="https://github.com/stellarproject"
+arch="noarch"
+license="MIT"
+depends="bash cryptsetup zfs zfs-scripts zfs-udev coreutils ca-certificates dbus udev acpi sudo less"
+makedepends=""
+install="$pkgname.post-install"
+options="!check !archcheck !strip"
+
+prepare() {
+    default_prepare
+}
+
+build() {
+    return 0
+}
+
+package() {
+    mkdir -p "$pkgdir"
+}

@@ -2,12 +2,12 @@
 # Maintainer: Evan Hazlett <ejhazlett@gmail.com>
 pkgname="terraos-installer"
 pkgver="0.1.10"
-pkgrel=0
+pkgrel=1
 pkgdesc="Stellar Project Terra OS Installer"
 url="https://github.com/stellarproject"
 arch="noarch"
 license="MIT"
-depends="dialog bash cryptsetup zfs zfs-scripts zfs-udev sgdisk efibootmgr"
+depends="dialog sgdisk efibootmgr terraos-base"
 makedepends=""
 install=""
 subpackages=""

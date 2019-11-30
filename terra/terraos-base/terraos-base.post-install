@@ -1,0 +1,7 @@
+#!/bin/sh
+
+rc-update add udev sysinit
+rc-update add udev-settle sysinit
+rc-update add udev-trigger sysinit
+rc-update add cgroups
+rc-update add zfs-mount
