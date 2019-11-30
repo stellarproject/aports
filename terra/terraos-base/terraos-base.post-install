@@ -1,4 +1,3 @@
 #!/bin/sh
 
 rc-update add cgroups
-rc-update add zfs-mount
