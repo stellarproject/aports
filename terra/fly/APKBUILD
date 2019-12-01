@@ -21,7 +21,7 @@ prepare() {
 
 build() {
     cd "$builddir"
-    go build -o ./bin/fly ./fly
+    go build -ldflags "-X github.com/concourse/concourse.Version=$pkgver-terra" -o ./bin/fly ./fly
 }
 
 check() {

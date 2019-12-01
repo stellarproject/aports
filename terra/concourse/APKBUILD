@@ -21,9 +21,13 @@ prepare() {
 
 build() {
     cd "$builddir"
+    # go deps
+    export GOPATH=$(mktemp -d)
+    go get -u github.com/gobuffalo/packr/packr
+    # web
     yarn install
     yarn build
-    go build -gcflags=all="-N -l" -o ./bin/concourse ./cmd/concourse
+    $GOPATH/bin/packr build -gcflags=all="-N -l" -ldflags "-X github.com/concourse/concourse.Version=$pkgver-terra" -o ./bin/concourse ./cmd/concourse
 }
 
 check() {
