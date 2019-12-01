@@ -1,0 +1,37 @@
+# Contributor: Evan Hazlett <ejhazlett@gmail.com>
+# Maintainer: Evan Hazlett <ejhazlett@gmail.com>
+pkgname="concourse"
+pkgver="5.7.2"
+pkgrel=0
+pkgdesc="Concourse CI/CD"
+url="https://github.com/concourse/concourse"
+arch="all"
+license="MIT"
+depends=""
+makedepends="yarn go"
+install=""
+subpackages=""
+source="concourse-$pkgver.zip::https://github.com/concourse/concourse/archive/v$pkgver.zip"
+builddir="$srcdir/$pkgname-$pkgver"
+options="!archcheck !strip"
+
+prepare() {
+    default_prepare
+}
+
+build() {
+    cd "$builddir"
+    yarn install
+    yarn build
+    go build -gcflags=all="-N -l" -o ./bin/concourse ./cmd/concourse
+}
+
+check() {
+    ./bin/concourse -v
+}
+
+package() {
+    mkdir -p "$pkgdir/usr/bin"
+    cp ./bin/concourse "$pkgdir/usr/bin/concourse"
+}
+sha512sums="df045c42b1119d2a335ce58542d8ed03e97a8d8aaa686914a5f1f2bc040af1f7abf842f211cd075772e309d72e2c11d60231402f6db63563fb746bb15263e269  concourse-5.7.2.zip"

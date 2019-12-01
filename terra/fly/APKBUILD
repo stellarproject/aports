@@ -1,0 +1,35 @@
+# Contributor: Evan Hazlett <ejhazlett@gmail.com>
+# Maintainer: Evan Hazlett <ejhazlett@gmail.com>
+pkgname="fly"
+pkgver="5.7.2"
+pkgrel=0
+pkgdesc="Concourse CI/CD Fly CLI"
+url="https://github.com/concourse/concourse"
+arch="all"
+license="MIT"
+depends=""
+makedepends="go"
+install=""
+subpackages=""
+source="concourse-$pkgver.zip::https://github.com/concourse/concourse/archive/v$pkgver.zip"
+builddir="$srcdir/concourse-$pkgver"
+options="!archcheck !strip"
+
+prepare() {
+    default_prepare
+}
+
+build() {
+    cd "$builddir"
+    go build -o ./bin/fly ./fly
+}
+
+check() {
+    ./bin/fly -v
+}
+
+package() {
+    mkdir -p "$pkgdir/usr/bin"
+    cp ./bin/fly "$pkgdir/usr/bin/fly"
+}
+sha512sums="df045c42b1119d2a335ce58542d8ed03e97a8d8aaa686914a5f1f2bc040af1f7abf842f211cd075772e309d72e2c11d60231402f6db63563fb746bb15263e269  concourse-5.7.2.zip"
