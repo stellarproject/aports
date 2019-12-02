@@ -13,6 +13,9 @@ MIRROR?=http://mirrors.gigenet.com/alpinelinux
 PACKAGE_DIR?=${HOME}/packages
 VAB_ARGS?=
 OUTPUT_DIR?=./build
+TAG?=edge
+VERSION?=latest
+ISO_EXTRA?=
 
 terra: $(PACKAGES)
 
@@ -23,7 +26,11 @@ $(PACKAGES):
 buildkit:
 	@vab build --local --output ${OUTPUT_DIR} -a PACKAGE_DIR=${PACKAGE_DIR} -a "PACKAGES=${PACKAGES}" -a MIRROR="${MIRROR}" -a SIGNING_PRIVATE_KEY="$${SIGNING_PRIVATE_KEY}" -a SIGNING_PUBLIC_KEY="$${SIGNING_PUBLIC_KEY}" ${VAB_ARGS} .
 
-clean:
-	@rm -rf build
+iso:
+	@echo "building iso ${VERSION} (${TAG})"
+	@cd scripts && sh mkimage.sh --tag ${TAG} --outdir ${OUTPUT_DIR} --arch x86_64 --repository ${MIRROR}/edge/main --repository ${MIRROR}/edge/testing --repository ${MIRROR}/edge/community ${ISO_EXTRA} --profile terra
 
-.PHONY: $(PACKAGES) buildkit terra clean
+clean:
+	@rm -rf ${OUTPUT_DIR}
+
+.PHONY: $(PACKAGES) buildkit iso terra clean
