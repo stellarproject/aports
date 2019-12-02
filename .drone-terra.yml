@@ -13,8 +13,10 @@ steps:
     - chmod -R +rw .
     - ls -lah .
     - ls -lah terra
-    - sudo -u $USER /bin/sh -c "make PACKAGE_DIR=$PACKAGE_DIR terra"
+    - sudo -u ${USER:-root} ${SHELL:-/bin/sh} -c "make PACKAGE_DIR=$PACKAGE_DIR terra"
   environment:
+    SHELL:
+      from_secret: shell
     PACKAGE_DIR:
       from_secret: package_dir
     USER:
