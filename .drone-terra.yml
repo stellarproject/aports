@@ -9,7 +9,7 @@ platform:
 steps:
 - name: build
   commands:
-    - ls -lah .
+    - chown -R $USER .
     - sudo -u $USER /bin/sh -c "make PACKAGE_DIR=$PACKAGE_DIR terra"
   environment:
     PACKAGE_DIR:
