@@ -12,6 +12,7 @@ steps:
     - chown -R $USER .
     - chmod -R +rw .
     - ls -lah .
+    - ls -lah terra
     - sudo -u $USER /bin/sh -c "make PACKAGE_DIR=$PACKAGE_DIR terra"
   environment:
     PACKAGE_DIR:
