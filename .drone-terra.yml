@@ -9,7 +9,8 @@ platform:
 steps:
 - name: build
   commands:
-    - chown -R $USER .
+    - env
+    - chown -R ${USER} .
     - chmod -R +rw .
     - ls -lah .
     - ls -lah terra
