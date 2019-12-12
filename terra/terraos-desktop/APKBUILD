@@ -2,12 +2,12 @@
 # Maintainer: Evan Hazlett <ejhazlett@gmail.com>
 pkgname="terraos-desktop"
 pkgver="0.2.0"
-pkgrel=3
+pkgrel=4
 pkgdesc="Stellar Project Terra OS Desktop"
 url="https://github.com/stellarproject"
 arch="noarch"
 license="MIT"
-depends="sway swaylock swayidle papirus-icon-theme alsa-utils alsa-lib alsaconf pulseaudio pulseaudio-alsa alsa-plugins-pulse pulseaudio-utils ttf-cantarell ttf-hack networkmanager coreutils dbus udev acpi bluez lxterminal alacritty firefox sudo xf86-input-libinput less xorg-server-xwayland dmenu mesa-dri-swrast"
+depends="sway swaylock swayidle papirus-icon-theme alsa-utils alsa-lib alsaconf pulseaudio pulseaudio-alsa alsa-plugins-pulse pulseaudio-utils ttf-cantarell ttf-hack networkmanager coreutils dbus udev acpi bluez lxterminal alacritty firefox sudo xf86-input-libinput less xorg-server-xwayland dmenu mesa-dri-swrast mesa-dri-intel mesa-dri-virtio"
 makedepends=""
 install="$pkgname.post-install"
 options="!check !archcheck !strip"
