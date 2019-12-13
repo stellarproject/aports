@@ -1,0 +1,62 @@
+# Contributor: Stuart Cardall <developer@it-offshore.co.uk>
+# Maintainer: Stuart Cardall <developer@it-offshore.co.uk>
+pkgname=wireguard-tools
+pkgver=0.0.20191212
+pkgrel=1
+pkgdesc="Next generation secure network tunnel: userspace tools"
+arch="all"
+url="https://www.wireguard.com"
+# SPDX identifier headers tells us 'GPL-2.0' but considering it
+# is a kernel project i think it is safe to assume it is GPL-2.0-only just
+# like the kernel.
+license="GPL-2.0-only"
+makedepends="libmnl-dev"
+depends="$pkgname-wg $pkgname-wg-quick"
+subpackages="
+	$pkgname-doc
+	$pkgname-bash-completion:bashcomp:noarch
+	$pkgname-wg:_split
+	$pkgname-wg-quick:_split:noarch
+	"
+options="!check"
+source="https://git.zx2c4.com/WireGuard/snapshot/WireGuard-$pkgver.tar.xz"
+builddir="$srcdir"/WireGuard-$pkgver
+
+build() {
+	make -C src/tools
+}
+
+package() {
+	mkdir -p "$pkgdir/usr/share/doc/$pkgname"
+
+	make -C src/tools \
+		DESTDIR="$pkgdir" \
+		WITH_BASHCOMPLETION=yes \
+		WITH_WGQUICK=yes \
+		WITH_SYSTEMDUNITS=no \
+		install
+
+	find "$builddir"/contrib/examples -name '.gitignore' -delete
+	cp -rf "$builddir"/contrib/examples "$pkgdir/usr/share/doc/$pkgname/"
+}
+
+_split() {
+	local cmd=${subpkgname/$pkgname-}
+	pkgdesc="$pkgdesc ($cmd)"
+	case $cmd in
+		wg-quick) depends="$pkgname-wg iproute2 bash openresolv" ;;
+		*) depends= ;;
+	esac
+	mkdir -p "$subpkgdir"/usr/bin
+	mv "$pkgdir"/usr/bin/$cmd "$subpkgdir"/usr/bin/
+}
+
+bashcomp() {
+	depends="bash"
+	pkgdesc="WireGuard bash completions"
+
+	mkdir -p "$subpkgdir"/usr
+	mv "$pkgdir"/usr/share "$subpkgdir"/usr
+}
+
+sha512sums="3e6b3841c72f0b30dab6e61ba07a865c5601617047f90a228cefc4ed6eb0511b9c76d745df9a89dfc71791937e1268bbc0b1cfa6f7291b77a4db0f2fb14d272a  WireGuard-0.0.20191212.tar.xz"

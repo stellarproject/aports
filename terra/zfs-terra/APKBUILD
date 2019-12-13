@@ -4,11 +4,11 @@
 # when changing _ver we *must* bump _rel
 _name=zfs
 _ver=0.8.2
-_rel=0
+_rel=2
 
 _flavor=${FLAVOR:-terra}
 _kpkg=linux-$_flavor
-_kver=5.3.15
+_kver=5.4.3
 _krel=0
 
 _kpkgver="$_kver-r$_krel"
