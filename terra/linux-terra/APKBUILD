@@ -8,7 +8,7 @@ case $pkgver in
 	*.*.*)	_kernver=${pkgver%.*};;
 	*.*) _kernver=$pkgver;;
 esac
-pkgrel=0
+pkgrel=1
 pkgdesc="Linux terra kernel"
 url="http://kernel.org"
 depends="mkinitfs"
@@ -207,5 +207,5 @@ _dev() {
 }
 
 sha512sums="6b5edef47c319a3fa7f6c20a3e0903a5acd89ec75e32dc5f99adcb60c9fe118ea312722d9c3d27e2e3900afa2455afb86e83a8b6bb131009bc79ddbe6fb0595d  linux-5.3.tar.xz
-086beadac970e7b4d4de748c13300f811521253f9af17b75c06af4fa9182b2d97209a2596dc8078bd13d717fe7e8b56e09dd2c716cd22d0e8f8e0e45453a80d9  config-terra.x86_64
+f8953e87f004eda83a070c4e4b80d1072f74d37e606ea66f37cbddabdbbc21c3c0d1d63158a69088888329a9f4b0a9536c7118bc24716b803e2a5cc62343ed3a  config-terra.x86_64
 d9c258a5519552831956b53b68aa16e93b4b5a4edfdf7dfb315405e419b084ca31c53bd7e8b486d6f6ab5d70f8535ccf8881d30392b34fd7b3c19f2e31e785a6  patch-5.3.15.xz"
