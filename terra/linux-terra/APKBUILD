@@ -1,19 +1,19 @@
-#Maintainer: Natanael Copa <ncopa@alpinelinux.org>
-#Maintainer: Michael Crosby <crosbymichael@gmail.com>
+# Maintainer: Natanael Copa <ncopa@alpinelinux.org>
 
 _flavor=terra
 pkgname=linux-${_flavor}
-pkgver=5.4.3
+pkgver=5.4.6
 case $pkgver in
 	*.*.*)	_kernver=${pkgver%.*};;
 	*.*) _kernver=$pkgver;;
 esac
-pkgrel=1
+pkgrel=0
 pkgdesc="Linux terra kernel"
 url="http://kernel.org"
 depends="mkinitfs"
 _depends_dev="perl gmp-dev elfutils-dev bash flex bison"
-makedepends="$_depends_dev sed installkernel bc linux-headers linux-firmware-any openssl-dev"
+makedepends="$_depends_dev sed installkernel bc linux-headers linux-firmware-any openssl-dev
+	diffutils"
 options="!strip"
 _config=${config:-config-terra.${CARCH}}
 install=
@@ -39,7 +39,7 @@ if [ "${pkgver%.0}" = "$pkgver" ]; then
 	source="$source
 	https://cdn.kernel.org/pub/linux/kernel/v${pkgver%%.*}.x/patch-$pkgver.xz"
 fi
-arch="all"
+arch="all !armhf"
 license="GPL-2.0"
 
 _carch=${CARCH}
@@ -98,15 +98,16 @@ oldconfig() {
 		make -C "$srcdir"/linux-$_kernver \
 			O="$_builddir" \
 			ARCH="$_carch" HOSTCC="$HOSTCC" \
-			listnewconfig olddefconfig
+			listnewconfig oldconfig
 	done
 }
 
 build() {
 	unset LDFLAGS
+	export KBUILD_BUILD_TIMESTAMP="$(date -Ru${SOURCE_DATE_EPOCH:+d @$SOURCE_DATE_EPOCH})"
 	for i in $_flavors; do
 		cd "$srcdir"/build-$i.$CARCH
-                make -j$(nproc) ARCH="$_carch" CC="${CC:-gcc}" \
+		make ARCH="$_carch" CC="${CC:-gcc}" \
 			KBUILD_BUILD_VERSION="$((pkgrel + 1 ))-Alpine"
 	done
 }
@@ -114,32 +115,28 @@ build() {
 _package() {
 	local _buildflavor="$1" _outdir="$2"
 	local _abi_release=${pkgver}-${pkgrel}-${_buildflavor}
+	export KBUILD_BUILD_TIMESTAMP="$(date -Ru${SOURCE_DATE_EPOCH:+d @$SOURCE_DATE_EPOCH})"
 
 	cd "$srcdir"/build-$_buildflavor.$CARCH
+	# modules_install seems to regenerate a defect Modules.symvers on s390x. Work
+	# around it by backing it up and restore it after modules_install
+	cp Module.symvers Module.symvers.backup
 
 	mkdir -p "$_outdir"/boot "$_outdir"/lib/modules
 
 	local _install
 	case "$CARCH" in
-	arm*)
-		local _dtbdir="$_outdir"/boot/dtbs
-		mkdir -p "$_dtbdir"
-		for i in arch/arm/boot/dts/*.dtb ; do
-			install -m644 "$i" "$_dtbdir"
-		done
-
-		_install=zinstall
-		;;
-	*)
-		_install=install
-		;;
+		arm*|aarch64) _install="zinstall dtbs_install";;
+		*) _install=install;;
 	esac
 
 	make -j1 modules_install $_install \
 		ARCH="$_carch" \
 		INSTALL_MOD_PATH="$_outdir" \
 		INSTALL_PATH="$_outdir"/boot \
-		|| return 1
+		INSTALL_DTBS_PATH="$_outdir/boot/dtbs-$_flavor"
+
+	cp Module.symvers.backup Module.symvers
 
 	rm -f "$_outdir"/lib/modules/${_abi_release}/build \
 		"$_outdir"/lib/modules/${_abi_release}/source
@@ -156,6 +153,11 @@ package() {
 	_package terra "$pkgdir"
 }
 
+# subflavors install in $subpkgdir
+virt() {
+	_package virt "$subpkgdir"
+}
+
 _dev() {
 	local _flavor=$(echo $subpkgname | sed -E 's/(^linux-|-dev$)//g')
 	local _abi_release=${pkgver}-${pkgrel}-$_flavor
@@ -169,15 +171,16 @@ _dev() {
 	pkgdesc="Headers and script for third party modules for $_flavor kernel"
 	depends="$_depends_dev"
 	local dir="$subpkgdir"/usr/src/linux-headers-${_abi_release}
+	export KBUILD_BUILD_TIMESTAMP="$(date -Ru${SOURCE_DATE_EPOCH:+d @$SOURCE_DATE_EPOCH})"
 
 	# first we import config, run prepare to set up for building
 	# external modules, and create the scripts
 	mkdir -p "$dir"
 	cp "$srcdir"/config-$_flavor.${CARCH} "$dir"/.config
-	echo "-$pkgrel-$_flavor" > "$dir"/localversion-alpine \
-		|| return 1
+	echo "-$pkgrel-$_flavor" > "$dir"/localversion-alpine
+
 	make -j1 -C "$srcdir"/linux-$_kernver O="$dir" ARCH="$_carch" HOSTCC="$HOSTCC" \
-		prepare modules_prepare scripts
+		syncconfig prepare modules_prepare scripts
 
 	# remove the stuff that points to real sources. we want 3rd party
 	# modules to believe this is the soruces
@@ -192,9 +195,10 @@ _dev() {
 		-o -path './scripts/*' -prune -o -type f \
 		\( -name 'Makefile*' -o -name 'Kconfig*' -o -name 'Kbuild*' -o \
 		   -name '*.sh' -o -name '*.pl' -o -name '*.lds' \) \
-		-print | cpio -pdm "$dir" || return 1
+		-print | cpio -pdm "$dir"
 
-	cp -a scripts include "$dir" || return 1
+	cp -a scripts include "$dir"
+
 	find $(find arch -name include -type d -print) -type f \
 		| cpio -pdm "$dir"
 
@@ -207,5 +211,5 @@ _dev() {
 }
 
 sha512sums="9f60f77e8ab972b9438ac648bed17551c8491d6585a5e85f694b2eaa4c623fbc61eb18419b2656b6795eac5deec0edaa04547fc6723fbda52256bd7f3486898f  linux-5.4.tar.xz
-f8953e87f004eda83a070c4e4b80d1072f74d37e606ea66f37cbddabdbbc21c3c0d1d63158a69088888329a9f4b0a9536c7118bc24716b803e2a5cc62343ed3a  config-terra.x86_64
-7146258dcd169552fdcc6ad02b709310e57d413be84c76061669712c840a6de3e8e104fdba763df284b465e0217a6e74435f1fb2e0faf16feb2d595193bd8a4a  patch-5.4.3.xz"
+05bc1d46609f131769e9cd10e4b25fb99353d1f5581fa32b6cc392e421251ae13142d985cd375969392001296b3f68cea35ccecbd1dcf1cd369437071d76e31e  config-terra.x86_64
+6f6d73c7ce71d47e810847149f4c258f5fb99c98fc67d385a3ff74889543a415bf8bb77c748a13f72b733bca770773731d84713a9be98d630b7377a792f11f5a  patch-5.4.6.xz"
