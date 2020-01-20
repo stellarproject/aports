@@ -2,7 +2,7 @@
 
 _flavor=terra
 pkgname=linux-${_flavor}
-pkgver=5.4.12
+pkgver=5.4.13
 case $pkgver in
 	*.*.*)	_kernver=${pkgver%.*};;
 	*.*) _kernver=$pkgver;;
@@ -211,4 +211,4 @@ _dev() {
 
 sha512sums="9f60f77e8ab972b9438ac648bed17551c8491d6585a5e85f694b2eaa4c623fbc61eb18419b2656b6795eac5deec0edaa04547fc6723fbda52256bd7f3486898f  linux-5.4.tar.xz
 05bc1d46609f131769e9cd10e4b25fb99353d1f5581fa32b6cc392e421251ae13142d985cd375969392001296b3f68cea35ccecbd1dcf1cd369437071d76e31e  config-terra.x86_64
-a5f247f9d8acb855936278679469de199a49366d79ea63b2a987a2bebb4fe5b7eeb698181fe6d561fd3de3c0736e42fd499c881abd6cd5fee996506133e4d143  patch-5.4.12.xz"
+e500486d372b242fb8fbffc780fb0a842012d699bb494c29a392befe0fd06e4858d89d995b71627e65eb93bf53af9f7bf37e8cbaa3d9356fc00356d81fbc893c  patch-5.4.13.xz"
