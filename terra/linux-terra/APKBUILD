@@ -12,7 +12,7 @@ pkgdesc="Linux terra kernel"
 url="http://kernel.org"
 depends="mkinitfs"
 _depends_dev="perl gmp-dev elfutils-dev bash flex bison"
-makedepends="$_depends_dev sed installkernel bc linux-headers linux-firmware-any openssl-dev diffutils"
+makedepends="$_depends_dev coreutils tar xz sed installkernel bc linux-headers linux-firmware-any openssl-dev diffutils"
 options="!strip"
 _config=${config:-config-terra.${CARCH}}
 install=
@@ -106,7 +106,7 @@ build() {
 	export KBUILD_BUILD_TIMESTAMP="$(date -Ru${SOURCE_DATE_EPOCH:+d @$SOURCE_DATE_EPOCH})"
 	for i in $_flavors; do
 		cd "$srcdir"/build-$i.$CARCH
-		make ARCH="$_carch" CC="${CC:-gcc}" \
+		make -j`nproc` ARCH="$_carch" CC="${CC:-gcc}" \
 			KBUILD_BUILD_VERSION="$((pkgrel + 1 ))-Alpine"
 	done
 }
@@ -211,4 +211,4 @@ _dev() {
 
 sha512sums="9f60f77e8ab972b9438ac648bed17551c8491d6585a5e85f694b2eaa4c623fbc61eb18419b2656b6795eac5deec0edaa04547fc6723fbda52256bd7f3486898f  linux-5.4.tar.xz
 05bc1d46609f131769e9cd10e4b25fb99353d1f5581fa32b6cc392e421251ae13142d985cd375969392001296b3f68cea35ccecbd1dcf1cd369437071d76e31e  config-terra.x86_64
-396eaf9fe88045e6e308cbe8e72217b3334b637bfa7e85f8d27cc4dd8e3d94c6f58d2b7b3e237defcf647d500610b85780ec2e21f1d91ac41c5f4ef3e74dc161  patch-5.4.7.xz"
+a5f247f9d8acb855936278679469de199a49366d79ea63b2a987a2bebb4fe5b7eeb698181fe6d561fd3de3c0736e42fd499c881abd6cd5fee996506133e4d143  patch-5.4.12.xz"
